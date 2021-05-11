@@ -1,0 +1,115 @@
+Configuring SNS Push Notifications on S3 Bucket Events Inside of the AWS Console
+Introduction
+In this live AWS environment, you will configure an S3 bucket to trigger AWS Simple Notification Service notifications whenever an object is added to an S3 bucket. This scenario will help you understand how you can architect your application to respond to S3 bucket events using other services such as SNS, AWS, Lambda, and others.
+
+Solution
+Log in to the AWS Management Console using the credentials provided on the lab instructions page. Make sure you're using the us-east-1 region.
+
+1.Create an S3 Bucket
+Navigate to the S3 portion of the console, click S3 under Storage.
+Click Create bucket.
+Provide a unique name for Bucket name. We used "sns-notifications-s3-test-errol".
+The Region should already be set to US East (N.Virgina) us-east-1.
+Click Add tag. Insert "CreatedBy" for Key and "Errol" for Value-optional.
+Click Create bucket.
+
+2.Create an SNS Topic
+Navigate to the main page of the AWS Management Console.
+Type "Simple" under Find Services.
+Select Simple Notification Service.
+Click the three lines located on the top left of the page to expand the sidebar.
+Click Topics in the sidebar.
+Click Create topic.
+Select Standard for Type.
+Give it a Name of "S3Events".
+Under Tags-optional, Insert "CreatedBy" for Key and "Errol" for Value-optional.
+Click Create topic.
+On the Topic details page, click Create subscription.
+Copy the ARN number located under S3Events Details to your clipboard.
+
+
+3.Configure the Bucket — Part 1
+Navigate back to AWS Management Console and click S3.
+Click on your newly created S3 bucket, sns-notifications-s3-test-errol.
+Click Properties.
+Scroll down to Event notifications.
+Click Create event notifications.
+Give it an Event name of "S3ObjectCreated".
+Select All object create events under Event types.
+Select SNS topic under Destination.
+Choose SNS topic by clicking the dropdown menu.
+Select topic S3Events.
+Click Save changes. (Note: Will receive an Unknown Error.)
+
+4.Modify the SNS Topic Policy
+Navigate to AWS Management Console and open Simple Notifications Services in a new browser.
+Click 1 under Topics.
+Click S3Events under Name.
+Click Edit.
+Update Access policy by clicking the dropdown menu to access JSON editor.
+Find line 4 and at the end of line 4, press Enter.
+Add the following code at line 5, after "Statement": [:
+
+{
+    "Effect": "Allow",
+    "Principal": {
+        "AWS": "*"
+},
+    "Action": "SNS:Publish",
+    "Resource": "SNS_ARN_REPLACE_ME",
+    "Condition": {
+        "StringEquals": {
+            "aws:SourceArn": "S3_BUCKET_ARN_REPLACEME"
+        }
+    }
+},
+Replace this line of code S3_BUCKET_ARN_REPLACEME, by navigating to S3 and copying the Amazon resource name (ARN) under Bucket overview to your clipboard.
+
+Replace this line of code SNS_ARN_REPLACE_ME, by navigating to Amazon SNA tab and copying the ARN under Topics.
+Scroll down and click Save changes.
+
+5.Configure the Bucket — Part 2
+Navigate to Amazon S3 Bucket.
+Click on your newly created S3 bucket, sns-notifications-s3-test-errol.
+Click Properties.
+Scroll down to Event notification.
+Click Create event notification.
+Give it an Event name of "S3CreatedObjects".
+Select All object create events under Event types.
+Select SNS topic under Destination.
+Choose SNS topic by clicking the dropdown menu.
+Select topic S3Events.
+Click Save changes. (Note: Should now be able to successfully save changes.)
+
+6.Create the Email Subscription
+Navigate to AWS Management Console.
+Click Simple Notification Service.
+In the left menu pane, click Subcriptions.
+Click Create subscription.
+Click the search field under Topic ARN.
+Your existing Events Topic ARN should automatically populate.
+Click the dropdown menu under Protocol and select Email.
+Enter your email address under Endpoint.
+Click Create subscription. (Note: Status will show Pending confirmation).
+Navigate to your email inbox to accept and confirm AWS notification subscription, clicking Confirm subscription.
+Subscription confirmed page will appear if successful.
+Navigate back to Amazon SNS details page and reload to confirm status.
+
+7.Create the SMS Subscription
+Go back to SNS Topics by clicking Topics.
+Click the radio button next to S3Events.
+Click Publish message.
+Insert "HELLO" under Subject-optional.
+Insert "This is a test message" under Message body.
+Scroll down and click Publish message.
+Navigate to your email inbox to confirm if AWS Notification email was received.
+Navigate to Amazon S3 Bucket.
+Click on your S3 bucket, sns-notifications-s3-test-errol.
+Click Upload under Objects.
+Click Add files.
+Select a file and click Upload.
+Navigate to your email inbox for the new Amazon S3 Notification email to verify SNS push notifications are working correctly.
+Please delete your email in the SNS section before closing the lab.
+
+Conclusion
+Congratulations — you've completed this hands-on lab!
